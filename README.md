@@ -12,12 +12,15 @@ Jio TV - Python Server
 - Channel Stream doesn't load at times.
     - restarting the server or reload solves most of the time
 - UI is pretty basic
+- Player may stutter during playback
 
 
 ### Future work:
 - Adding EPG to UI and Backend
 - Enhancing UI
+- Improving Flask routes
 - Support for navigation from TV Devices (I really hope this works!)
+
 
 `PS. I began working on this project to get Jio TV working on my fireTV. Starting this server on my computer allows me to access this anywhere on my network. Unfortunately at the moment this site isn't remote friendly :(
 `
