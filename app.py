@@ -3,24 +3,22 @@ from flask import Flask,render_template,stream_with_context
 import requests
 from jiolib import JioTV
 from urllib.parse import unquote
+import json
+
 
 app = Flask(__name__)
-jio = JioTV("+918921433239", "password")
+jio = JioTV("username", "password")
 
 
 @app.route("/")
 def home():
     return render_template('player.html', pathToSource="Animal_Planet_HD.m3u8")
 
-
-@app.route("/video-stream/<path:path>")
-def remoteVideoStream(path):
-    result = firetv.playStream(unquote(path))
-    if(result):
-        return path
-    else:
-        return "<Failed>"
-
+@app.route('/channelList')
+def channelList():
+    f = open("assets/channels.json")
+    channels = json.load(f)
+    return render_template('channelList.html',channels=channels)
 
 @app.route("/<path:path>")
 def common_page(path):
