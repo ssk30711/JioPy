@@ -1,6 +1,4 @@
-from logging import DEBUG
 from flask import Flask,render_template,stream_with_context
-import requests
 from jiolib import JioTV
 from urllib.parse import unquote
 import json
