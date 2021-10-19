@@ -5,29 +5,40 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Channel List</title>
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <style>
+        .img-logo{
+            height: 60px;
+        }
+    </style>
 </head>
 <body>
-    <table>
-        <thead>
-            <tr>
-                <td>Channel No.</td>
-                <td>Resolution</td>
-                <td>Logo</td>
-                <td>Channel Name</td>
-                <td>Play</td>
-            </tr>
-        </thead>
-        <tbody>
-            {% for channel in channels %}
-            <tr>
-                <td>{{ channels[channel]['channel_id'] }}</td>
-                <td>{{ "HD" if channels[channel]['isHD']==True else "SD" }}</td>
-                <td>{{ channels[channel]['logo'] }}</td>
-                <td>{{ channel }}</td>
-                <td><a href="/{{ channel }}">Play</a></td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
+    <div class="w3-container w3-margin w3-padding">
+        
+        <h2 class="w3-margin w3-padding w3-center" > Jio Channel List </h3>
+        
+        <table class="w3-table w3-table-all">
+            <thead>
+                <tr>
+                    <td>Channel No.</td>
+                    <td>Resolution</td>
+                    <td>Logo</td>
+                    <td>Channel Name</td>
+                    <td>Play</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for channel in channels %}
+                <tr>
+                    <td>{{ channels[channel]['channel_id'] }}</td>
+                    <td><label class="{{ "w3-blue" if channels[channel]['isHD']==True else "w3-orange" }} w3-rounded w3-small w3-padding" for="Channel">{{ "HD" if channels[channel]['isHD']==True else "SD" }}</label></td>
+                    <td><img class="w3-img-responsive img-logo" src="http://sgdccdnems04.cdnsrv.jio.com/jiotv.catchup.cdn.jio.com/dare_images/images/{{ channels[channel]['logo'] }}" alt=""></td>
+                    <td>{{ channel.replace("_"," ") }}</td>
+                    <td><a class="w3-button w3-small" href="/{{ channel }}">Play</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </body>
 </html>
