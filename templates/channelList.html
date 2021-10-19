@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channel List</title>
+</head>
+<body>
+    <table>
+        <thead>
+            <tr>
+                <td>Channel No.</td>
+                <td>Resolution</td>
+                <td>Logo</td>
+                <td>Channel Name</td>
+                <td>Play</td>
+            </tr>
+        </thead>
+        <tbody>
+            {% for channel in channels %}
+            <tr>
+                <td>{{ channels[channel]['channel_id'] }}</td>
+                <td>{{ "HD" if channels[channel]['isHD']==True else "SD" }}</td>
+                <td>{{ channels[channel]['logo'] }}</td>
+                <td>{{ channel }}</td>
+                <td><a href="/{{ channel }}">Play</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
