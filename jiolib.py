@@ -1,31 +1,28 @@
 import requests
 import urlquick
-from uuid import uuid4
 import time
 import base64
 import hashlib
 import re
-import m3u8
 from flask import Response
 
 
 class JioTV:
     
+    retries = 0
     username=""
     password=""
     
     # Support Objects
-    session= False
     HEADERS= False
     CREDS  = False
     token  = False
     
     def __init__(self,username,password):
-        self.session = requests.Session()
         self.username = username
         self.password = password
         self.login()
-    
+
     def login(self):
         body = {
             "identifier": self.username,
@@ -54,26 +51,32 @@ class JioTV:
                 "uniqueId": response.get("sessionAttributes", {}).get("user", {}).get("unique"),
                 "crmid": response.get("sessionAttributes", {}).get("user", {}).get("subscriberId"),
             }
+            # self.CREDS['ssotoken'] = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1bmlxdWUiOiI1YWNiYjk5Yi05ZjhiLTQ1ZTctYmVlYy02Zjg4MWE2NWI3YjQiLCJ1c2VyVHlwZSI6IlJJTHBlcnNvbiIsImF1dGhMZXZlbCI6IjIwIiwiZGV2aWNlSWQiOiJjNDMyMTNhOGMzYjljNTAxYzI4MDY1NjRiYzNkNjlhNDkwY2IwZDdiOTM0MzI4MDQ5Mzk1MTU0Mzk3NmViOTM2ZDcxNmZmZTMwYmNjM2UxOWU1MTMzZjNiNTg1MjNiNGY3OGU0YWMxYjFhYzc4MTVjNTNjMTE5MDBkYTM0ZTEwZCIsImp0aSI6ImE5NDY1ZmZhLTk5NzMtNDRhMi05Zjk1LTI2ZTFiZjI5ZDNiOCIsImlhdCI6MTY0NzMyMTA5NH0.B3GYQpugRqj2_AGgMbUzBOk-qzZj5-v3g0vxBazT79c"
             self.HEADERS = {
-                "User-Agent": "JioTV",
-                "os": "Kodi",
-                "deviceId": str(uuid4()),
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/99.0.4844.51 Safari/537.36",
+                "os": "Android",
+                "deviceId": "6e1a0e1c-5935-48e5-a8d7-c86534afa4d8",
                 "versionCode": "226",
-                "devicetype": "Kodi",
+                "devicetype": "Android",
                 "srno": "200206173037",
                 "appkey": "NzNiMDhlYzQyNjJm",
                 "channelid": "100",
                 "usergroup": "tvYR7NSNn7rymo3F",
-                "lbcookie": "1"
             }
+            #str(uuid4()) for device ID
             print(" * Login Successful")
             self.HEADERS.update(self.CREDS)
             return "success"
         else:
             msg = response.get("message", "Error @ login()")
-            print("Error @ Login")
+            print("Error @ Login",msg)
             return msg
-    
+
+    def reLogin(self):
+        print("Attempting Relogin...")
+        if(self.retries<=3):
+            self.login()
+            self.retries+=1
     
     def getToken(self):
         def magic(x): return base64.b64encode(hashlib.md5(x.encode()).digest()).decode().replace(
@@ -91,39 +94,40 @@ class JioTV:
         return response["result"]
     
     def getChannelPlaylist(self,channel):
+        #url = "http://mumsite.cdnsrv.jio.com/jiotv.live.cdn.jio.com/"+channel+"/"+channel+"_1200.m3u8"
         url = "http://jiotv.live.cdn.jio.com/"+channel+"/"+channel+"_1200.m3u8"
         self.token = self.getToken()
         response = requests.get(url,params=self.token,headers=self.HEADERS)
+        if("406 Not Acceptable" in response.text):
+            self.reLogin()
+        if("404 Not Found" in response.text):
+            print("Channel not Found")
+            return '''
+#EXTM3U
+#EXT-X-VERSION:3
+#EXT-X-TARGETDURATION:20
+#EXTINF:15.000,
+http://localhost/nostreamavailable.mp4
+'''
         return self.proxify(response.text,channel)
     
     def proxify(self,content,channel):
-        # return content
         content = re.sub("https://tv.media.jio.com/streams_live/","",content)
         def matches(match): return channel+"/"+match.group(0)       
         return re.sub("[-A-Za-z_0-9]*.ts",matches,content)
     
-    def clientOld(self,url):
-        #url= "Animal_Planet_HD_800-1620914368000.ts"
-        url = "http://jiotv.live.cdn.jio.com/"
-        channelName="DD_National"
-        self.token = self.getToken()
-        req = urlquick.get(url+"/"+channelName+"/"+channelName+"_1200.m3u8", headers=self.HEADERS, params=token)
-        player = m3u8.loads(req.text)
-        url = player.data["segments"][1]["key"]["uri"]
-        response  = urlquick.get(url,headers=self.HEADERS,params=token)
-        return response.content
-    
     def client(self,url):
-        #url= "Animal_Planet_HD_800-1620914368000.ts"
-        # token = self.getToken()
         self.token = self.getToken()
         url = "https://tv.media.jio.com/streams_live/"+url
+        # url = "http://mumsite.cdnsrv.jio.com/jiotv.live.cdn.jio.com/"+url
         print(url)
         response  = urlquick.get(url,headers=self.HEADERS,params=self.token)
-        # return response.content
-        return Response(response.iter_content(chunk_size=10*1024),
+        if("406 Not Acceptable" in response.text):
+            self.reLogin()
+        else:
+            self.retries=0
+        try:
+            return Response(response.iter_content(chunk_size=10*1024),
                     content_type=response.headers['Content-Type'])
-
-
-# jio = JioTV("***REMOVED***", "***REMOVED***")
-# print(jio.getChannelPlaylist("DD_National"))
+        except:
+            return Response(response.iter_content(chunk_size=10*1024))
