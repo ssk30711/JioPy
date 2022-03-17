@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=Edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>{{ channel }} | JioTV</title>
+
+  <title> Animal Planet HD - JioTV </title>
+  <meta property="og:image" content="http://sgdccdnems04.cdnsrv.jio.com/jiotv.catchup.cdn.jio.com/dare_images/images/Animal_Planet_HD.png" />
+  <link href="https://unpkg.com/video.js@7/dist/video-js.min.css" rel="stylesheet">
+  <link rel="icon" href="http://sgdccdnems04.cdnsrv.jio.com/jiotv.catchup.cdn.jio.com/dare_images/images/{{ channel }}.png" type="image/gif" sizes="16x16">
+  <!-- Forest -->
+  <link href="https://unpkg.com/@videojs/themes@1/dist/sea/index.css" rel="stylesheet">	
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+
+  <script src='http://vjs.zencdn.net/7.6.0/video.min.js'></script>
+
+  <style>
+    .selector{
+        position: absolute;
+    background: white;
+    z-index: 1000;
+    bottom: 5%;
+    width: 90%;
+    /* text-align: center; */
+    padding: 14px;
+    margin: auto;
+    /* display: flex; */
+    opacity: 0.5;
+    border-radius: 20px;
+    left: 5%;
+    height: 100px;    }
+    .helpText{
+        text-align: right;
+    margin: -10px;
+    }
+</style>
+  
+  <!-- Custom Styles -->
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+
+<body>
+  <player>
+    <video controls id="television" style="width: 100%;height: 100%;" class="video-js vjs-theme-forest" >
+		<source src="{{ channel }}.m3u8" type="application/x-mpegURL">
+	</video>
+	<script>
+        
+        var player = videojs('television',{
+            //autoplay:true,
+            preload:'metadata',
+            plugin:{} 
+        });
+        
+        player.on('play', () => {
+            document.getElementsByTagName('overlay')[0].classList.add('overlay-hide')
+           setTimeout(()=>{
+            document.getElementsByTagName('overlay')[0].style.display = 'none'
+           },1000)
+        });
+        player.on('pause', () => {
+            document.getElementsByTagName('overlay')[0].style.display = 'block'
+            setTimeout(()=>{
+            document.getElementsByTagName('overlay')[0].classList.remove('overlay-hide')
+           },1000)
+        });
+	</script>
+  </player>
+  
+  <overlay>
+    <a href="#" class="logo"><img src="http://sgdccdnems04.cdnsrv.jio.com/jiotv.catchup.cdn.jio.com/dare_images/images/{{ channel }}.png" alt="" /></a>
+    <div class="banner">
+      <div class="content">
+        <h2 id="showName">{{ showName }}</h2>
+        <p id="showDesc">{{ showDesc }}</p>
+        <a href="#" class="play" onclick="player.play()"><i class="fa fa-play playBTN"></i> Play Stream</a>
+      </div>
+    </div>
+  </overlay> 
+</body>
+<script>
+    let CurrentShow =fetch("/EPG/NOW/{{channel}}")
+    CurrentShow.then(res =>
+            res.json()).then(d => {
+                document.getElementById('showName').innerText = d["showname"];
+                document.getElementById('showDesc').innerText = d["description"];
+                console.log(d)
+            })
+</script>
+</html>
