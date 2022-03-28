@@ -127,7 +127,7 @@ http://localhost/nostreamavailable.mp4
         #else:
         #    self.retries=0
         try:
-            return Response(response.iter_content(chunk_size=10*1024),
+            return Response(response.iter_content(chunk_size=1024*1024),
                     content_type=response.headers['Content-Type'])
         except:
-            return Response(response.iter_content(chunk_size=10*1024))
+            return Response(response.iter_content(chunk_size=1024*1024))
