@@ -122,10 +122,10 @@ http://localhost/nostreamavailable.mp4
         # url = "http://mumsite.cdnsrv.jio.com/jiotv.live.cdn.jio.com/"+url
         print(url)
         response  = urlquick.get(url,headers=self.HEADERS,params=self.token)
-        if("406 Not Acceptable" in response.text):
-            self.reLogin()
-        else:
-            self.retries=0
+        #if("406 Not Acceptable" in response.text):
+        #    self.reLogin()
+        #else:
+        #    self.retries=0
         try:
             return Response(response.iter_content(chunk_size=10*1024),
                     content_type=response.headers['Content-Type'])
