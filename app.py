@@ -1,9 +1,8 @@
-from flask import Flask,render_template,send_from_directory,request
+from flask import Flask,render_template,request
 from jiolib import JioTV
 import json
 import requests
 from datetime import datetime
-import time
 
 app = Flask(__name__, static_folder='static')
 jio = JioTV("+91","")
