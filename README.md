@@ -1,5 +1,8 @@
 # Jio-PyServer
 
+[![Telegram Group](https://img.shields.io/endpoint?color=neon&style=flat-square&url=https%3A%2F%2Ftg.sumanjay.workers.dev%2Fjio_pyserver)](https://t.me/jio_pyserver)
+
+
 Jio TV - Python Server   
 *Watch TV ~right from your laptop!~ anywhere on your home network!*
 
