@@ -1,18 +1,17 @@
-from flask import Flask,render_template,send_from_directory
+from flask import Flask,render_template,request
 from jiolib import JioTV
 import json
 import requests
 from datetime import datetime
-import time
 
 app = Flask(__name__, static_folder='static')
-jio = JioTV("+91********", "password")
+jio = JioTV("","")
 
-retries = 0
-
-@app.route("/")
-def home():
-    return render_template('index.html', channel="Animal_Planet_HD")
+@app.route('/')
+def channelList():
+    f = open("static/channel-list.json")
+    channels = json.load(f)
+    return render_template('channelList.html',channels=channels)
 
 @app.route("/EPG/<int:channel_id>")
 def getEPG(channel_id):
@@ -21,7 +20,7 @@ def getEPG(channel_id):
 
 @app.route("/EPG/NOW/<string:channel_name>")
 def getEPGNow(channel_name):
-    f = open("assets/channels.json")
+    f = open("static/channels.json")
     channelList = json.load(f)
     channel_id = channelList[channel_name]["channel_id"]
     epgData = requests.get("http://snoidcdnems04.cdnsrv.jio.com/jiotv.data.cdn.jio.com/apis/v1.3/getepg/get?offset=0&channel_id={}".format(str(channel_id)))
@@ -34,12 +33,6 @@ def getEPGNow(channel_name):
         if(startTime<nowTime and endTime>nowTime):
             return json.dumps(show)
     return "IDK"
-
-@app.route('/channelList')
-def channelList():
-    f = open("assets/channel-list.json")
-    channels = json.load(f)
-    return render_template('channelList.html',channels=channels)
 
 @app.route("/<path:path>")
 def common_page(path):
@@ -58,16 +51,12 @@ def common_page(path):
 def login():
     return "<p>Hello, Loginer! This page is not ready :(</p>"
 
-@app.route("/all_channels.m3u8")
-def allChannels():
-    return send_from_directory('assets','channels.m3u8', as_attachment=False)
-
-@app.route("/nostreamavailable.mp4")
-def nostream():
-    return send_from_directory('assets','NoStreamVideo.mp4', as_attachment=False)
-
+@app.route("/channels.m3u8")
+def channels_playlist():
+    f = open('templates/channels.m3u8').read()
+    return f.replace("<IP>",request.host)
 
 if __name__ == "__main__":
-    app.run(debug=True,host='0.0.0.0',port=80)
+    app.run(debug=False,host='0.0.0.0',port=1024)
 
 
