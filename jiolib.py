@@ -115,10 +115,6 @@ class JioTV:
         url = "https://tv.media.jio.com/streams_live/"+url
         #print(url)
         response = requests.get(url,params=self.token,headers=self.HEADERS,verify=False,stream=True)
-        if("406 Not Acceptable" in response.text):
-            self.reLogin()
-        else:
-            self.retries=0
         try:
             return response.content
         except:
