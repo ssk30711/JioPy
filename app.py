@@ -6,7 +6,7 @@ from datetime import datetime
 import time
 
 app = Flask(__name__, static_folder='static')
-jio = JioTV("***REMOVED***","***REMOVED***")
+jio = JioTV("+91","")
 
 @app.route('/')
 def channelList():
