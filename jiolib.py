@@ -102,17 +102,7 @@ class JioTV:
             self.reLogin()
         if("404 Not Found" in response.text):
             print("Channel not Found")
-<<<<<<< HEAD
             return ""
-=======
-            return '''
-#EXTM3U
-#EXT-X-VERSION:3
-#EXT-X-TARGETDURATION:20
-#EXTINF:15.000,
-http://localhost/nostreamavailable.mp4
-'''
->>>>>>> 78a3f11f50226eb3e912d154581eee5c08b98fdb
         return self.proxify(response.text,channel)
     
     def proxify(self,content,channel):
@@ -123,30 +113,13 @@ http://localhost/nostreamavailable.mp4
     def client(self,url):
         self.token = self.getToken()
         url = "https://tv.media.jio.com/streams_live/"+url
-        # url = "http://mumsite.cdnsrv.jio.com/jiotv.live.cdn.jio.com/"+url
-        print(url)
-<<<<<<< HEAD
-        #response  = urlquick.get(url,headers=self.HEADERS,params=self.token)
+        #print(url)
         response = requests.get(url,params=self.token,headers=self.HEADERS,verify=False,stream=True)
         if("406 Not Acceptable" in response.text):
             self.reLogin()
         else:
             self.retries=0
         try:
-            # return Response(response.iter_content(chunk_size=10*1024),
-            # content_type=response.headers['Content-Type'])
             return response.content
         except:
             return Response(response.iter_content(chunk_size=10*1024))
-=======
-        response  = urlquick.get(url,headers=self.HEADERS,params=self.token)
-        #if("406 Not Acceptable" in response.text):
-        #    self.reLogin()
-        #else:
-        #    self.retries=0
-        try:
-            return Response(response.iter_content(chunk_size=1024*1024),
-                    content_type=response.headers['Content-Type'])
-        except:
-            return Response(response.iter_content(chunk_size=1024*1024))
->>>>>>> 78a3f11f50226eb3e912d154581eee5c08b98fdb
